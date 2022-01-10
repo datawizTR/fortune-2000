@@ -1,0 +1,120 @@
+---
+title: "A lool at the fortune 2000"
+author: "Tim R"
+date: "10/01/2022"
+output: html_document
+---
+
+$~$
+
+## About this dataset
+
+* #### This is a data set with information about the fortune 2000 companies including their location, markett cap, assets and profits 
+
+* #### In terms of data intergrity, this data set is licensed by the CCO public domain and is easily accesible to anyone
+
+* #### The purpose of this analysis is to get an idea of how the top 2000 companies are structured and if the covid 19 pandemic had an effect pon their ability to make profits
+
+$~$
+
+
+
+```{r echo=FALSE}
+
+install.packages('tidyverse', repos="http://cran.us.r-project.org" )
+
+library(tidyverse)
+library(dplyr)
+
+dt<-read_csv('fortune2000.csv')
+```
+$~$
+
+#### After loading the data we want to get an idea of how the data is structured , which why we use the below functions before our officil analysis
+```{r}
+head(dt)
+count(distinct(dt,Country)) 
+summary(dt)
+sapply(dt,class)
+```
+
+$~$
+
+#### The data is structured jin the form of character varibales, which mneans that R is reading everything including numbers as text. This makes it difficult for us to perform statiscal equations so our first goal should be to change that particular data holding numbers into numeric varibales using the 'as.numeric' function
+```{r}
+dt$Sales<-as.numeric(factor(dt$Sales))
+
+dt$Profit<-as.numeric(as.factor(dt$Profit))
+
+dt$Assets<-as.numeric(as.factor(dt$Assets))
+
+dt$`Market Value` <- as.numeric(as.factor(dt$`Market Value`))
+```
+
+$~$
+
+#### We then run the code below to make sure that our data has succesfully been changed into numeric varibales, I also use the 'is.na' function to make sure we didnt create any null values during the transformaation process
+```{r}
+sapply(dt,class)
+
+sum(is.na(dt$Sales))
+```
+
+$~$
+
+* #### I have rearranged the data and ordered it by 'market value' in descending orddr so that the highest valued companies appear at the top, this makes it easy to distinguis the biggest compoanies from the small ones and a quick way to get informationj on either the top or bottom companies would be by easily using the 'head' or tail' function followed by number of companies you want, as shown bellow.
+
+* #### You might have noticed that I also used the write functions, this is because I want to use the data sets i just created to form graphs in tableau
+
+```{r}
+dt_up<-dt%>%arrange(desc(`Market Value`))
+ 
+
+topten<-head(dt_up, n=10)
+bottomten<-tail(dt_up,n=10)
+
+summary(dt_up)
+summary(topten)
+
+write.csv(topten,'fortune2000top10.csv')
+write.csv(dt_up,'fortune2000updated.csv')
+```
+
+$~$
+
+#### Below is basic statistical information regarding the data set 
+```{r}
+sum(dt_up$Assets)
+```
+
+
+```{r}
+sum(bottomten$`Market Value`)
+```
+
+
+```{r}
+sum(topten$`Market Value`)
+```
+
+
+```{r}
+sum(dt_up$`Market Value`)
+```
+
+$~$
+
+```{r}
+top10aspercentageof2000<-sum(topten$`Market Value`)/ sum(dt_up$`Market Value`) * 100
+
+top10aspercentageof2000
+```
+
+
+```{r}
+percentoffortune2000USA<-sum(dt_up$`Market Value`[dt_up$Country=="United States"])/ sum(dt_up$`Market Value`) * 100
+
+percentoffortune2000USA
+```
+
+$~$
